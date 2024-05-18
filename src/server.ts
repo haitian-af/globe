@@ -2,6 +2,7 @@ import type * as Party from "partykit/server";
 
 // Representing a person's position
 type Position = {
+  note: string | undefined;
   lat: number;
   lng: number;
   id: string;
@@ -19,9 +20,7 @@ export type OutgoingMessage =
     };
 
 // This is the state that we'll store on each connection
-type ConnectionState = {
-  position: Position;
-};
+type ConnectionState = { position: Position; };
 
 export default class Server implements Party.Server {
   // Let's use hibernation mode so we can scale to thousands of connections
@@ -48,6 +47,7 @@ export default class Server implements Party.Server {
     // And save this on the connection's state
     conn.setState({
       position: {
+        note: '🇭🇹',
         lat,
         lng,
         id,
@@ -95,14 +95,11 @@ export default class Server implements Party.Server {
   onClose(connection: Party.Connection<unknown>): void | Promise<void> {
     this.onCloseOrError(connection);
   }
-  onError(
-    connection: Party.Connection<unknown>,
-    error: Error
-  ): void | Promise<void> {
+
+  onError(connection: Party.Connection<unknown>, error: Error): void | Promise<void>{
     this.onCloseOrError(connection);
   }
 }
 
 // That's it! Easy.
-
 Server satisfies Party.Worker;

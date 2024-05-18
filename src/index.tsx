@@ -124,10 +124,13 @@ function App() {
 export function Cobe() {
   const canvasRef = useRef();
   useEffect(() => {
+    let phi = 0
     let width = 0;
+    //@ts-ignore
     const onResize = () => canvasRef.current && (width = canvasRef.current.offsetWidth)
     window.addEventListener('resize', onResize)
     onResize()
+    //@ts-ignore
     const globe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
       width: width * 2,
@@ -153,6 +156,8 @@ export function Cobe() {
         phi += 0.005;
       }
     })
+
+    //@ts-ignore
     setTimeout(() => canvasRef.current.style.opacity = '1')
     return () => { 
       globe.destroy();
@@ -166,6 +171,7 @@ export function Cobe() {
     position: 'relative',
   }}>
     <canvas
+      //@ts-ignore
       ref={canvasRef}
       style={{
         width: '100%',

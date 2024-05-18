@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "partykit dev",
-    "deploy": "partykit deploy"
+    "deploy": "partykit deploy",
+    "build": "react-scripts build"
   },
   "dependencies": {
     "@types/react": "^18.2.48",
@@ -15,7 +16,21 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "partykit": "^0.0.79",
+    "react-scripts": "^5.0.1",
     "typescript": "^5.3.3"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
