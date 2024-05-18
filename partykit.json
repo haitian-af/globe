@@ -6,7 +6,7 @@
   "serve": {
     "path": "public",
     "build": {
-      "entry": "src/client.tsx",
+      "entry": "src/index.tsx",
       "minify": true
     }
   }

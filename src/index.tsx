@@ -33,7 +33,7 @@ function App() {
   const socket = usePartySocket({
     // host: 'localhost:1999',
     host: 'https://partykit.darkfadr.partykit.dev',
-    room: "default",
+    room: "globe-party",
     onMessage(evt) {
       const message = JSON.parse(evt.data) as OutgoingMessage;
       if (message.type === "add-marker") {
