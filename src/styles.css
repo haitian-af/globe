@@ -31,6 +31,11 @@ h6 {
 
 #app {
   padding: 1rem;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  align-content: center;
 }
 
 h1 {
@@ -47,4 +52,11 @@ a {
   text-decoration-line: underline;
   text-underline-offset: 3px;
   text-decoration-color: #555;
+}
+
+.signup {
+  padding: 8px 14px;
+  background: white;
+  color: black;
+  border-radius: 3px;
 }

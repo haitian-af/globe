@@ -13,6 +13,9 @@ function App() {
   const canvasRef = useRef<HTMLCanvasElement>();
   // The number of markers we're currently displaying
   const [counter, setCounter] = useState(0);
+  const [visible, setVisibility] = useState(true);
+  const toggle = () => setVisibility(true);
+
   // A map of marker IDs to their positions
   // Note that we use a ref because the globe's `onRender` callback
   // is called on every animation frame, and we don't want to re-render
@@ -28,6 +31,8 @@ function App() {
   >(new Map());
   // Connect to the PartyKit server
   const socket = usePartySocket({
+    // host: 'localhost:1999',
+    host: 'https://partykit.darkfadr.partykit.dev',
     room: "default",
     onMessage(evt) {
       const message = JSON.parse(evt.data) as OutgoingMessage;
@@ -55,8 +60,8 @@ function App() {
 
     const globe = createGlobe(canvasRef.current as HTMLCanvasElement, {
       devicePixelRatio: 2,
-      width: 400 * 2,
-      height: 400 * 2,
+      width: 1000,
+      height: 1000,
       phi: 0,
       theta: 0,
       dark: 1,
@@ -77,7 +82,7 @@ function App() {
 
         // Rotate the globe
         state.phi = phi;
-        phi += 0.01;
+        phi += 0.005;
       },
     });
 
@@ -88,35 +93,90 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Where's everyone at?</h1>
+      <h1 style={{ marginTop: 80 }}>Where are the Haitians?</h1>
       {counter !== 0 ? (
         <p>
-          <b>{counter}</b> {counter === 1 ? "person" : "people"} connected.
+          <b>{counter}</b> {counter === 1 ? "Haitian" : "Haitians"} online.
         </p>
       ) : (
         <p>&nbsp;</p>
       )}
 
+      {/* {visible != true && <button className="signup" onClick={toggle}>Sign up to leave your mark</button>} */}
+
       {/* The canvas where we'll render the globe */}
       <canvas
         ref={canvasRef as LegacyRef<HTMLCanvasElement>}
-        style={{ width: 400, height: 400, maxWidth: "100%", aspectRatio: 1 }}
+        style={{ width: 500, height: 500, maxWidth: "100%", aspectRatio: 1, visibility: visible && 'visible' || 'hidden' }}
+        width={1000}
+        height={1000}
       />
 
-      {/* Let's give some credit */}
-      <p>
-        Powered by <a href="https://cobe.vercel.app/">🌏 Cobe</a>,{" "}
-        <a href="https://www.npmjs.com/package/phenomenon">Phenomenon</a> and{" "}
-        <a href="https://partykit.io/">🎈 PartyKit</a>
-      </p>
-      <p>
-        Code:{" "}
-        <a href="https://github.com/partykit/sketch-globe">
-          https://github.com/partykit/sketch-globe
-        </a>
-      </p>
+      {/* <Cobe /> */}
+
+      <p>Built by Haitians, for 🇭🇹</p>
+      <p>A <a href="https://haitian.af">haitian.af</a> Experiment...Powered by OSS & Pilkiz</p>
     </div>
   );
 }
+
+
+export function Cobe() {
+  const canvasRef = useRef();
+  useEffect(() => {
+    let width = 0;
+    const onResize = () => canvasRef.current && (width = canvasRef.current.offsetWidth)
+    window.addEventListener('resize', onResize)
+    onResize()
+    const globe = createGlobe(canvasRef.current, {
+      devicePixelRatio: 2,
+      width: width * 2,
+      height: width * 2 * 0.4,
+      phi: 0,
+      theta: 0.3,
+      dark: 1,
+      diffuse: 3,
+      mapSamples: 16000,
+      mapBrightness: 1.2,
+      baseColor: [1, 1, 1],
+      markerColor: [251 / 255, 100 / 255, 21 / 255],
+      glowColor: [1.2, 1.2, 1.2],
+      markers: [],
+      scale: 2.5,
+      offset: [0, width * 2 * 0.4 * 0.6],
+      onRender: (state) => {
+        state.width = width * 2
+        state.height = width * 2 * 0.4
+
+        // Rotate the globe
+        state.phi = phi;
+        phi += 0.005;
+      }
+    })
+    setTimeout(() => canvasRef.current.style.opacity = '1')
+    return () => { 
+      globe.destroy();
+      window.removeEventListener('resize', onResize);
+    }
+  }, [])
+  return <div style={{
+    width: '100%',
+    aspectRatio: 1/.4,
+    margin: 'auto',
+    position: 'relative',
+  }}>
+    <canvas
+      ref={canvasRef}
+      style={{
+        width: '100%',
+        height: '100%',
+        contain: 'layout paint size',
+        opacity: 0,
+        transition: 'opacity 1s ease',
+      }}
+    />
+  </div>
+}
+
 
 createRoot(document.getElementById("root")!).render(<App />);
