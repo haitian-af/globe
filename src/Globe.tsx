@@ -1,7 +1,7 @@
 import { useEffect, useRef, forwardRef, type Ref } from "react";
 import createGlobe from "cobe";
 import { useSpring } from 'react-spring';
-import * as turf from "@turf/turf";
+// import * as turf from "@turf/turf";
 
 type Markers = Map<
   string,
@@ -29,10 +29,10 @@ export const Globe = forwardRef(({ markers }: { markers: Ref<Markers> }) => {
     let phi = 0
     let width = 0;
     let height = 0;
-    const points = turf.randomPoint(25)
-      .features.map(f => f.geometry.coordinates)
+    // const points = turf.randomPoint(25)
+    //   .features.map(f => f.geometry.coordinates)
 
-    console.log('generated points', points);
+    // console.log('generated points', points);
 
     const onResize = () => {
       if(canvasRef.current) {
@@ -100,6 +100,7 @@ export const Globe = forwardRef(({ markers }: { markers: Ref<Markers> }) => {
         //@ts-ignore
         ref={canvasRef}
         onPointerDown={(e) => {
+          //@ts-ignore
           pointerInteracting.current = e.clientX - pointerInteractionMovement.current;
           //@ts-ignore
           canvasRef.current.style.cursor = 'grabbing';
