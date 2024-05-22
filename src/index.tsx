@@ -98,7 +98,7 @@ function App() {
 
   return (
     <div className="App" style={{ height: '100vh' }}>
-      <h1 style={{ marginTop: 80 }}>Where are the Haitians?</h1>
+      <h1 style={{ marginTop: 50 }}>Haitians Are Everywhere</h1>
       {counter !== 0 ? (
         <p>
           <b>{counter}</b> {counter === 1 ? "Haitian" : "Haitians"} online.
@@ -109,8 +109,8 @@ function App() {
       
       <Globe markers={positions} />
       
-      <p>A <a href="https://haitian.af">haitian.af</a>  Experiment... built by Haitians, for Haitians 🇭🇹</p>
-      <p>Powered by OSS & Pilkiz</p>
+      <p>A <a href="https://haitian.af">haitian.af</a>  Experiment</p>
+      <p>Powered by OSS & Pilkiz 🇭🇹</p>
     </div>
   );
 }
