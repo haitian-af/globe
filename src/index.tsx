@@ -1,14 +1,15 @@
 import "./styles.css";
 
-import { useEffect, useRef, type LegacyRef, useState, forwardRef, type Ref } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import usePartySocket from "partysocket/react";
-import createGlobe from "cobe";
-import { useSpring } from 'react-spring';
+import { faker } from '@faker-js/faker';
 import { Globe } from "./Globe";
 
 // The type of messages we'll be receiving from the server
 import type { OutgoingMessage } from "./server";
+import { Toaster, toast } from "react-hot-toast";
+import { useInterval } from "usehooks-ts";
 
 type Markers = Map<
   string,
@@ -54,6 +55,28 @@ function App() {
       }
     },
   });
+
+  useInterval(
+    () => {
+      toast.success(
+       `🇭🇹 Haitian in ${faker.location.city()}\n${faker.lorem.sentence()}`, 
+        { 
+          icon: null, 
+          position: 'bottom-right', 
+          duration: 10000,
+          style: {
+            textAlign: 'left',
+            borderRadius: '5px',
+            background: '#333',
+            color: '#fff',
+          },
+        }
+      );
+    },
+    // Delay in milliseconds or null to stop it
+    faker.number.int({ min: 500, max: 2000 })
+  )
+  
 
   
   /*
@@ -111,6 +134,7 @@ function App() {
       
       <p>A <a href="https://haitian.af">haitian.af</a>  Experiment</p>
       <p>Powered by OSS & Pilkiz 🇭🇹</p>
+      <Toaster/>
     </div>
   );
 }
