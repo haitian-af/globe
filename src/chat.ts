@@ -1,13 +1,11 @@
 import type * as Party from "partykit/server";
-import { event, json, emit } from './events';
-import type { ConnectionState, OutgoingMessage, Position } from "./types";
+import { event, json, type Event } from './events';
+import type { ConnectionState, Position } from "./types";
 
 const FINGERPRINT_KEY = 'fp';
 export default class Server implements Party.Server {
-  // Let's use hibernation mode so we can scale to thousands of connections
   static options = { hibernate: true };
 
-  // A no-op, but this assigns room to this.room (thanks typescript!)
   constructor(readonly room: Party.Room) {}
 
   onConnect(
@@ -21,24 +19,20 @@ export default class Server implements Party.Server {
     
     //TODO: add error handling for connections missing fingerprint
     const fingerprint = new URL(request.url).searchParams.get(FINGERPRINT_KEY)
-    const connect_event = event<Position>("connection", { lat, lng, id, signature: fingerprint }, { cf: request.cf })
+    const connect_event = event<Position>("connection", { lat, lng, id, signature: fingerprint })
+    //get city to incluse w/ state 
 
+    console.log('connectiong establised to chat', connect_event);
     conn.setState(connect_event.data as Position);
-    emit(connect_event);
 
-    // Now, let's send the entire state to the new connection
-    for (const connection of this.room.getConnections<ConnectionState>()) {
-      try {
-        conn.send(json(event<Position>('add-marker', connection.state!)))
-        // And let's send the new connection's position to all other connections
-        if (connection.id !== conn.id) {
-          connection.send(json(event<Position>('add-marker', conn.state!)))
+    this.room.broadcast(json(connect_event))
+  }
 
-        }
-      } catch (err) {
-        this.onCloseOrError(conn);
-      }
-    }
+  onMessage(message: string | ArrayBuffer | ArrayBufferView, sender: Party.Connection<unknown>): void | Promise<void> {
+    console.log('>>>>> got the following chat message', message, sender);
+    const ev = JSON.parse(message as string) as Event<unknown>;
+    //todo: check for profanity
+    this.room.broadcast(message);
   }
 
   // Whenever a connection closes (or errors),
@@ -46,7 +40,7 @@ export default class Server implements Party.Server {
   // to remove the marker
   onCloseOrError(connection: Party.Connection<unknown>) {
     this.room.broadcast(
-      json(event('remove-marker', { id: connection.id! })),
+      json(event('chat.leave', { id: connection.id!, name: 'Some Haitian' })),
       [connection.id]
     );
   }
