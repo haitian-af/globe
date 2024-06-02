@@ -1,6 +1,7 @@
 import type * as Party from "partykit/server";
 import { event, json, emit } from './events';
 import type { ConnectionState, OutgoingMessage, Position } from "./types";
+import { geocode } from "./api";
 
 const FINGERPRINT_KEY = 'fp';
 export default class Server implements Party.Server {
@@ -10,7 +11,7 @@ export default class Server implements Party.Server {
   // A no-op, but this assigns room to this.room (thanks typescript!)
   constructor(readonly room: Party.Room) {}
 
-  onConnect(
+  async onConnect(
     conn: Party.Connection<ConnectionState>,
     ctx: Party.ConnectionContext
   ) {
@@ -19,9 +20,15 @@ export default class Server implements Party.Server {
     const lat = parseFloat(request.cf!.latitude as string);
     const lng = parseFloat(request.cf!.longitude as string);
     
+    const { data } = await geocode({ lat, lng });
+    const { properties } = data.features.pop()
+    const { country, region } = properties.context
+    
+    console.log('detected the following region', country, region);
+    
     //TODO: add error handling for connections missing fingerprint
     const fingerprint = new URL(request.url).searchParams.get(FINGERPRINT_KEY)
-    const payload = { lat, lng, id, signature: fingerprint, location: [lat, lng] }
+    const payload = { lat, lng, id, signature: fingerprint, location: [lat, lng], place: { country, region } };
     const connect_event = event<Position>("connection", payload, { cf: request.cf })
 
     conn.setState(connect_event.data as Position);

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "partykit dev",
     "deploy": "partykit deploy",
+    "logs": "partykit tail",
     "build": "react-scripts build"
   },
   "dependencies": {
