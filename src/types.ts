@@ -4,6 +4,7 @@ export type Position = {
   lat: number;
   lng: number;
   id: string;
+  region?: any;
   signature: string | null;
 };
 

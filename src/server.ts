@@ -21,7 +21,8 @@ export default class Server implements Party.Server {
     
     //TODO: add error handling for connections missing fingerprint
     const fingerprint = new URL(request.url).searchParams.get(FINGERPRINT_KEY)
-    const connect_event = event<Position>("connection", { lat, lng, id, signature: fingerprint }, { cf: request.cf })
+    const payload = { lat, lng, id, signature: fingerprint, location: [lat, lng] }
+    const connect_event = event<Position>("connection", payload, { cf: request.cf })
 
     conn.setState(connect_event.data as Position);
     emit(connect_event);

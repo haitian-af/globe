@@ -1,6 +1,7 @@
 import type * as Party from "partykit/server";
 import { event, json, type Event } from './events';
 import type { ConnectionState, Position } from "./types";
+import { geocode } from "./api";
 
 const FINGERPRINT_KEY = 'fp';
 export default class Server implements Party.Server {
@@ -8,7 +9,7 @@ export default class Server implements Party.Server {
 
   constructor(readonly room: Party.Room) {}
 
-  onConnect(
+  async onConnect(
     conn: Party.Connection<ConnectionState>,
     ctx: Party.ConnectionContext
   ) {
@@ -16,10 +17,12 @@ export default class Server implements Party.Server {
     const { request } = ctx;
     const lat = parseFloat(request.cf!.latitude as string);
     const lng = parseFloat(request.cf!.longitude as string);
+    const region = await geocode({ lat, lng });
     
+    console.log('detected the following region', region);
     //TODO: add error handling for connections missing fingerprint
     const fingerprint = new URL(request.url).searchParams.get(FINGERPRINT_KEY)
-    const connect_event = event<Position>("connection", { lat, lng, id, signature: fingerprint })
+    const connect_event = event<Position>("connection", { lat, lng, region, id, signature: fingerprint })
     //get city to incluse w/ state 
 
     console.log('connectiong establised to chat', connect_event);
