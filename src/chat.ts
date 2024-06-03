@@ -17,13 +17,15 @@ export default class Server implements Party.Server {
     const { request } = ctx;
     const lat = parseFloat(request.cf!.latitude as string);
     const lng = parseFloat(request.cf!.longitude as string);
-    const region = await geocode({ lat, lng });
+
+    const { data } = await geocode({ lat, lng });
+    const { properties } = data.features.pop()
+    const { country, region } = properties.context
     
     console.log('detected the following region', region);
     //TODO: add error handling for connections missing fingerprint
     const fingerprint = new URL(request.url).searchParams.get(FINGERPRINT_KEY)
-    const connect_event = event<Position>("connection", { lat, lng, region, id, signature: fingerprint })
-    //get city to incluse w/ state 
+    const connect_event = event<Position>("chat.join", { id, lat, lng, place: { country, region}, signature: fingerprint })
 
     console.log('connectiong establised to chat', connect_event);
     conn.setState(connect_event.data as Position);

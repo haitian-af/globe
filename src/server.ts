@@ -22,16 +22,17 @@ export default class Server implements Party.Server {
     
     const { data } = await geocode({ lat, lng });
     const { properties } = data.features.pop()
-    const { country, region } = properties.context
+    const { country, region, district, place } = properties.context
     
     console.log('detected the following region', country, region);
     
     //TODO: add error handling for connections missing fingerprint
     const fingerprint = new URL(request.url).searchParams.get(FINGERPRINT_KEY)
-    const payload = { lat, lng, id, signature: fingerprint, location: [lat, lng], place: { country, region } };
+    const payload = { lat, lng, id, signature: fingerprint, location: [lat, lng], place: { country, region, district, place } };
     const connect_event = event<Position>("connection", payload, { cf: request.cf })
 
     conn.setState(connect_event.data as Position);
+    conn.send(json(connect_event));
     emit(connect_event);
 
     // Now, let's send the entire state to the new connection
