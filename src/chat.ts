@@ -25,7 +25,8 @@ export default class Server implements Party.Server {
     console.log('detected the following region', region);
     //TODO: add error handling for connections missing fingerprint
     const fingerprint = new URL(request.url).searchParams.get(FINGERPRINT_KEY)
-    const connect_event = event<Position>("chat.join", { id, lat, lng, place: { country, region}, signature: fingerprint })
+    const payload = { id, lat, lng, place: { country, region}, signature: fingerprint };
+    const connect_event = event<Position>("chat.join", payload, fingerprint);
 
     console.log('connectiong establised to chat', connect_event);
     conn.setState(connect_event.data as Position);

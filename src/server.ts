@@ -17,8 +17,9 @@ export default class Server implements Party.Server {
   ) {
     const id = conn.id;
     const { request } = ctx;
-    const lat = parseFloat(request.cf!.latitude as string);
-    const lng = parseFloat(request.cf!.longitude as string);
+    const { latitude, longitude , city, colo, continent, country: pais, region: zone, regionCode: zoneCode } = request.cf!;
+    const lat = parseFloat(latitude as string);
+    const lng = parseFloat(longitude as string);
     
     const { data } = await geocode({ lat, lng });
     const { properties } = data.features.pop()
@@ -28,8 +29,17 @@ export default class Server implements Party.Server {
     
     //TODO: add error handling for connections missing fingerprint
     const fingerprint = new URL(request.url).searchParams.get(FINGERPRINT_KEY)
-    const payload = { lat, lng, id, signature: fingerprint, location: [lat, lng], place: { country, region, district, place } };
-    const connect_event = event<Position>("connection", payload, { cf: request.cf })
+    const payload = {
+      lat, lng, id, 
+      signature: fingerprint, 
+      location: [lat, lng], 
+      city, colo, continent, zone, zoneCode,
+      country: pais,
+
+      place: { country, region, district, place },
+      cf: request.cf
+    };
+    const connect_event = event<Position>("connection", payload, fingerprint)
 
     conn.setState(connect_event.data as Position);
     conn.send(json(connect_event));
