@@ -26,13 +26,13 @@ export const emit = async (e: Event<unknown>): Promise<void> => {
 
 export const json = JSON.stringify
 
-export const event = <T,>(type: string, data: T, attrs: any = {}): Event<T> => ({
+export const event = <T,>(type: string, data: T, subject: string | null= null): Event<T> => ({
   id: cuid(),
   specversion: "1.0",
   source: "party",
+  subject,
   type,
   time: new Date().toISOString(),
   datacontenttype: 'application/json',
-  data,
-  ...attrs,
+  data
 });
