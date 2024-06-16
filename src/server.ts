@@ -1,5 +1,5 @@
 import type * as Party from "partykit/server";
-import { event, json, emit } from './events';
+import { event, json, emit, Event } from './events';
 import type { ConnectionState, OutgoingMessage, Position } from "./types";
 import { geocode } from "./api";
 
@@ -21,11 +21,11 @@ export default class Server implements Party.Server {
     const lat = parseFloat(latitude as string);
     const lng = parseFloat(longitude as string);
     
-    const { data } = await geocode({ lat, lng });
-    const { properties } = data.features.pop()
-    const { country, region, district, place } = properties.context
+    // const { data } = await geocode({ lat, lng });
+    // const { properties } = data.features.pop()
+    // const { country, region, district, place } = properties.context
     
-    console.log('detected the following region', country, region);
+    console.log('detected the following region', pais, colo, zone);
     
     //TODO: add error handling for connections missing fingerprint
     const fingerprint = new URL(request.url).searchParams.get(FINGERPRINT_KEY)
@@ -36,7 +36,7 @@ export default class Server implements Party.Server {
       city, colo, continent, zone, zoneCode,
       country: pais,
 
-      place: { country, region, district, place },
+      // place: { country, region, district, place },
       cf: request.cf
     };
     const connect_event = event<Position>("connection", payload, fingerprint)
@@ -58,6 +58,22 @@ export default class Server implements Party.Server {
         this.onCloseOrError(conn);
       }
     }
+  }
+
+  //HTTP request handler
+  async onRequest(request: Party.Request) {
+    if (request.method.toUpperCase() !== 'POST') {
+      return new Response("Method not allowed", { status: 405 });
+    }
+
+    const payload = await request.json<Event<object>>();
+    if (!payload.data || !payload.source || !payload.type) {
+      return new Response("Bad Request", { status: 400 });
+    }
+    //validate event
+    payload.cf = request.cf;
+    emit(payload);
+    return new Response("OK");
   }
 
   // Whenever a connection closes (or errors),
