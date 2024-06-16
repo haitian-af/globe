@@ -1,5 +1,6 @@
 import type * as Party from "partykit/server";
-import { event, json, emit, Event } from './events';
+import type { Event } from './events';
+import { event, json, emit } from './events';
 import type { ConnectionState, OutgoingMessage, Position } from "./types";
 import { geocode } from "./api";
 
