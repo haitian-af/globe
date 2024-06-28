@@ -1,5 +1,5 @@
 import type * as Party from "partykit/server";
-import { event, json, type Event } from './events';
+import { emit, event, json, type Event } from './events';
 import type { ConnectionState, Position } from "./types";
 import { geocode } from "./api";
 
@@ -37,7 +37,9 @@ export default class Server implements Party.Server {
   onMessage(message: string | ArrayBuffer | ArrayBufferView, sender: Party.Connection<unknown>): void | Promise<void> {
     console.log('>>>>> got the following chat message', message, sender);
     const ev = JSON.parse(message as string) as Event<unknown>;
-    //todo: check for profanity
+    emit(ev) //send to ingest
+
+    //todo: eventually check for profanity
     this.room.broadcast(message);
   }
 
